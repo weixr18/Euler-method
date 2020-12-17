@@ -1,5 +1,3 @@
-<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
-
 # Euler-Method
  
 Euler's method for solving systems of simple differential equations, C++ implementation.
