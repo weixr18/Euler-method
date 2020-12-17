@@ -1,3 +1,10 @@
+/*
+    mpmat_utils.h: Utilities for MpMat class.
+    Copyright (C) 2020 Xinran Wei.
+
+    Full LICENCE: ./LICENCE
+*/
+
 #ifndef _MPMAT_UTILS_H
 #define _MPMAT_UTILS_H
 

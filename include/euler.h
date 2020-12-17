@@ -1,3 +1,10 @@
+/*
+    euler.h: Euler methods.
+    Copyright (C) 2020 Xinran Wei.
+
+    Full LICENCE: ./LICENCE
+*/
+
 #ifndef _EULER_H
 #define _EULER_H
 

@@ -1,3 +1,10 @@
+/*
+    mpmat.cpp: A multiple precision 2-D matrix implementation.
+    Copyright (C) 2020 Xinran Wei.
+
+    Full LICENCE: ./LICENCE
+*/
+
 #include "mpmat.h"
 #include "mpmat_utils.h"
 

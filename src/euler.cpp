@@ -1,3 +1,10 @@
+/*
+    euler.cpp: Euler methods.
+    Copyright (C) 2020 Xinran Wei.
+
+    Full LICENCE: ./LICENCE
+*/
+
 #include "euler.h"
 #include "mpmat_utils.h"
 
