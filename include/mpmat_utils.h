@@ -9,7 +9,7 @@
 #define _MPMAT_UTILS_H
 
 #include <exception>
-#include <gmp.h>
+#include <gmp/gmp.h>
 
 enum MpMatOprType {
     MpMatAdd,

@@ -1,5 +1,5 @@
 CC:= g++
-INCLUDE:= -I./include -I./include/gmp
+INCLUDE:= -I./include
 LIBS:= -lstdc++ -lgmpxx -lgmp -L./lib
 CXXFLAGS:= -std=c++11 -g
 DIR_SRC:= ./src

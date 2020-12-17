@@ -11,7 +11,7 @@
 #include <iostream>
 #include <exception>
 #include <Eigen/Core>
-#include <gmp.h>
+#include <gmp/gmp.h>
 
 //#define mp_num mpf_
 

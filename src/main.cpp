@@ -29,7 +29,7 @@
 #include "mpmat_utils.h"
 #include "euler.h"
 
-/*
+
 int main(int argc, char** argv) {
 
     // get args
@@ -115,10 +115,4 @@ int main(int argc, char** argv) {
     mp_num_clear(step_num);
 
     return 0;
-}
-*/
-
-int main(int argc, char** argv) {
-
-
 }
