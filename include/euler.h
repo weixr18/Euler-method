@@ -1,8 +1,8 @@
 #ifndef _EULER_H
 #define _EULER_H
 
-#include "mpmat.h"
 #include <functional>
+#include "mpmat.h"
 
 class EulerMethod {
 public:

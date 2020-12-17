@@ -1,6 +1,6 @@
 CC:= g++
-INCLUDE:= -I./include -IE:/OPEN/libs/gmp-6.2.1/gmp/include -IE:/OPEN/MinGW/mingw64/mingw-w64-gcc-10.2/include
-LIBS:= -lstdc++ -lgmpxx -lgmp -LE:/OPEN/libs/gmp-6.2.1/gmp/lib
+INCLUDE:= -I./include -I./include/gmp
+LIBS:= -lstdc++ -lgmpxx -lgmp -L./lib
 CXXFLAGS:= -std=c++11 -g
 DIR_SRC:= ./src
 DIR_OBJ:= ./obj
