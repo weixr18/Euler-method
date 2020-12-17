@@ -15,6 +15,7 @@ GMP is an open source multi-precision computing library under the GNU protocol, 
 Example:
 
 ```
+mkdir lib
 mv E:\libs\gmp-6.2.1\gmp\lib\* .\lib
 ```
  
@@ -53,8 +54,10 @@ You can replace it with your own equation's expression.
 To run the following example, use this command
 
 ```ps1
-./main -s <step-number> -t <end-time>
+./main -s <step> -x <value>
 ```
+
+in which "step" means "number of steps per unit of time" and "value" means "terminal value of independant variable x".
 
 For example:
 
