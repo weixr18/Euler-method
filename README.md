@@ -1,3 +1,5 @@
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
+
 # Euler-Method
  
 Euler's method for solving systems of simple differential equations, C++ implementation.
@@ -52,13 +54,13 @@ You can replace it with your own equation's expression.
 
 To run the following example, use this command
 
-```ps
+```ps1
 ./main -s <step-number> -t <end-time>
 ```
 
 For example:
 
-```ps
+```ps1
 ./main -s 100000 -t 3
 ```
 
