@@ -1,7 +1,7 @@
 /*
     mpmat.cpp: A multiple precision 2-D matrix implementation.
-    Copyright (C) 2020 Xinran Wei.
 
+    Copyright (C) 2020 Xinran Wei <weixr0605@sina.com>
     Full LICENCE: ./LICENCE
 */
 
@@ -61,6 +61,20 @@ void MpMat::init() {
             mp_num_set_d(v_[i][j], 0);
         }
     }
+}
+
+/*
+* transform to Eigen matrix
+*/
+Eigen::MatrixXd MpMat::to_matrix() const {
+
+    Eigen::MatrixXd res(row_, col_);
+    for (int i = 0; i < row_; i++) {
+        for (int j = 0; j < col_; j++) {
+            res(i, j) = mp_num_get_d(v_[i][j]);
+        }
+    }
+    return res;
 }
 
 
@@ -244,6 +258,14 @@ MpMat MpMat::operator* (const mp_num_t& q) const {
         }
     }
     return res;
+}
+
+uint32_t MpMat::row_num() const {
+    return row_;
+}
+
+uint32_t MpMat::col_num() const {
+    return col_;
 }
 
 

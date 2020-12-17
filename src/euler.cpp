@@ -1,10 +1,11 @@
 /*
     euler.cpp: Euler methods.
-    Copyright (C) 2020 Xinran Wei.
 
+    Copyright (C) 2020 Xinran Wei <weixr0605@sina.com>
     Full LICENCE: ./LICENCE
 */
 
+#include <Eigen/Core>
 #include "euler.h"
 #include "mpmat_utils.h"
 
@@ -29,9 +30,13 @@ MpMat EulerMethod::run(const MpMat& Y_0, const mp_num_t& x_0, const mp_num_t& x_
 
     // steps
     MpMat Y_n = Y_0.copy();
+    uint32_t Y_size = Y_0.row_num();
+    Eigen::MatrixXd res(Y_size, num);
     for (int i = 0; i < num; i++) {
         Y_n = step(Y_n, h);
+        res.block(0, i, Y_size, 1) = Y_n.to_matrix();
     }
+
 
     mp_num_clear(h);
     mp_num_clear(tmp);
@@ -39,13 +44,11 @@ MpMat EulerMethod::run(const MpMat& Y_0, const mp_num_t& x_0, const mp_num_t& x_
     return Y_n;
 }
 
-
 EulerMethod::EulerMethod(std::function<MpMat(const MpMat&)> F) {
     F_ = F;
 }
 
-EulerMethod::~EulerMethod()
-{
+EulerMethod::~EulerMethod() {
 }
 
 
@@ -55,14 +58,12 @@ MpMat ForwardEuler::step(const MpMat& Y_n, const mp_num_t& h) {
     return Y_n + F_(Y_n) * h;
 }
 
-ForwardEuler::~ForwardEuler()
-{
+ForwardEuler::~ForwardEuler() {
 }
 
 /********* Transform Euler method *********/
 
 MpMat TransformEuler::step(const MpMat& Y_n, const mp_num_t& h) {
-
     mp_num_t half_h;
     mp_num_init(half_h);
     mp_num_div_ui(half_h, h, 2);
@@ -71,7 +72,6 @@ MpMat TransformEuler::step(const MpMat& Y_n, const mp_num_t& h) {
     return Y_n + F_(Y_n_and_half) * h;
 }
 
-TransformEuler::~TransformEuler()
-{
+TransformEuler::~TransformEuler() {
 }
 

@@ -1,7 +1,7 @@
 /*
     euler.h: Euler methods.
-    Copyright (C) 2020 Xinran Wei.
 
+    Copyright (C) 2020 Xinran Wei <weixr0605@sina.com>
     Full LICENCE: ./LICENCE
 */
 

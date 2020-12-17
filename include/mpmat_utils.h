@@ -1,7 +1,7 @@
 /*
     mpmat_utils.h: Utilities for MpMat class.
-    Copyright (C) 2020 Xinran Wei.
 
+    Copyright (C) 2020 Xinran Wei <weixr0605@sina.com>
     Full LICENCE: ./LICENCE
 */
 

@@ -1,7 +1,7 @@
 /*
     main.cpp: Entrance of program.
 
-    Copyright (C) 2020 Xinran Wei.
+    Copyright (C) 2020 Xinran Wei <weixr0605@sina.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -24,11 +24,12 @@
 #include <iostream>
 #include <string.h>
 
+
 #include "mpmat.h"
 #include "mpmat_utils.h"
 #include "euler.h"
 
-
+/*
 int main(int argc, char** argv) {
 
     // get args
@@ -37,19 +38,21 @@ int main(int argc, char** argv) {
     int i_steps;
     args_format_right = (argc == 5)
         && (strncmp(argv[1], "-s", 10) == 0)
-        && (strncmp(argv[3], "-t", 10) == 0)
+        && (strncmp(argv[3], "-x", 10) == 0)
         && ((i_steps = atoi(argv[2])) > 0)
         && ((i_x_n = atoi(argv[4])) > 0);
 
     if (!args_format_right) {
         printf("Arguments:\n");
-        printf("\t -s <step-number> integer\n");
-        printf("\t -t <end-time> integer\n");
+        printf("\t -s <step> Integer. Number of steps per unit of time.\n");
+        printf("\t -x <value> Integer. Terminal value of independant variable x.\n");
         return 0;
     }
+    int total_steps = i_steps * i_x_n;
 
+    // set precision
     mpf_set_default_prec(FLOAT_BITS);
-    printf("default precision: %d\n", mpf_get_default_prec());
+    printf("Using float number of %d bits.\n", mpf_get_default_prec());
 
     // differencial equation
     char const* A[4][4] = {
@@ -85,33 +88,37 @@ int main(int argc, char** argv) {
 
     auto quardic = [&](const MpMat& Y) {return mB * Y.T() * mA * Y + mC * Y;};
 
-    // calculation parameter
+    // calculation parameters
     mp_num_t x_0, x_n, step_num;
     mp_num_init(x_0);
     mp_num_init(x_n);
     mp_num_init(step_num);
     mp_num_set_d(x_n, i_x_n);
-    mp_num_set_d(step_num, i_steps);
-    printf("precision of x_0, x_n, step_num: %d, %d, %d\n",
-        mpf_get_prec(x_0),
-        mpf_get_prec(x_n),
-        mpf_get_prec(step_num)
-    );
+    mp_num_set_d(step_num, total_steps);
 
     // run
+    printf("Running forward Euler algorithm.\n");
     ForwardEuler forward_euler(quardic);
     MpMat res = forward_euler.run(mY, x_0, x_n, step_num);
-    printf("ForwardEuler Result:\n");
+    printf("Result:\n");
     MpMat::print(res);
 
+    printf("Running transform Euler algorithm.\n");
     TransformEuler transform_euler(quardic);
     res = transform_euler.run(mY, x_0, x_n, step_num);
-    printf("TransformEuler Result:\n");
+    printf("Result:\n");
     MpMat::print(res);
 
     printf("Done.\n");
     mp_num_clear(x_0);
     mp_num_clear(x_n);
     mp_num_clear(step_num);
+
     return 0;
+}
+*/
+
+int main(int argc, char** argv) {
+
+
 }

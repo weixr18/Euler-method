@@ -1,7 +1,7 @@
 /*
     mpmat.h: A multiple precision 2-D matrix implementation.
-    Copyright (C) 2020 Xinran Wei.
 
+    Copyright (C) 2020 Xinran Wei <weixr0605@sina.com>
     Full LICENCE: ./LICENCE
 */
 
@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <exception>
+#include <Eigen/Core>
 #include <gmp.h>
 
 //#define mp_num mpf_
@@ -44,6 +45,7 @@ public:
     MpMat copy() const;
     static MpMat zeros_like(const MpMat& mat);
     MpMat& operator= (const MpMat& mat);
+    Eigen::MatrixXd to_matrix() const;
 
     MpMat transpose() const;
     MpMat T() const;
@@ -53,6 +55,9 @@ public:
     MpMat operator- (const MpMat& mat) const;
 
     static void print(const MpMat& mat);
+    uint32_t row_num() const;
+    uint32_t col_num() const;
+
 
 private:
     mp_num_t** v_ = nullptr;
