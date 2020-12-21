@@ -28,8 +28,6 @@
 #include "mpmat_utils.h"
 #include "euler.h"
 
-
-
 char const* A[EQ_NUM][EQ_NUM] = {
         "0", "0", "1", "0",
         "0", "0", "0", "0",
@@ -37,8 +35,8 @@ char const* A[EQ_NUM][EQ_NUM] = {
         "0", "0", "0", "0",
 };
 char const* B[EQ_NUM][1] = {
-    "-5e-7",
-    "5e-7",
+    "-1e-5",
+    "1e-5",
     "0",
     "0",
 };
@@ -56,16 +54,15 @@ char const* Y[EQ_NUM][1] = {
 };
 
 char const* M[EQ_NUM][EQ_NUM] = {
-    "5e-3", "0", "5e-3", "1e-9",
-    "5e-3", "0.4", "5e-3", "0",
+    "0.1", "0", "0.1", "1e-9",
+    "0.1", "0.4", "0.1", "0",
     "0", "0.4", "0.5", "0",
     "0", "0", "0.5", "0",
 };
-
 char const* L[EQ_NUM][1] = {
-    "4.1",
-    "1690",
-    "6120",
+    "6000",
+    "3400",
+    "6500",
     "2000",
 };
 
@@ -130,12 +127,14 @@ int main(int argc, char** argv) {
     printf("Result:\n");
     MpMat::print(res);
 
+    /*
     printf("Running transform Euler algorithm.\n");
     TransformEuler transform_euler(quardic, mpm_M, mpm_L, x_0, x_n, boundary);
     res = transform_euler.run(mpm_Y);
     printf("Result:\n");
     MpMat::print(res);
+    */
 
-    printf("Done.\n");
+    printf("Mission completed.\n");
     return 0;
 }

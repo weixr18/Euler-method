@@ -22,6 +22,7 @@ MpMat EulerMethod::run(const MpMat& mpm_Y_0) {
             printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\bStep: %8d", i);
         }
     }
+    printf("......Done\n");
     return mpm_Y_n;
 }
 
@@ -49,6 +50,12 @@ MpMat ForwardEuler::step(const MpMat& mpm_Y_n) {
     return mpm_Y_n + F_(mpm_Y_n) * mp_h_;
 }
 
+eigen_mat mat_exp(const eigen_mat& A) {
+    eigen_mat I;
+    I.setIdentity(A.cols(), A.cols());
+    return I + A * (I + A * 3 / 8 * (I + A / 6 * (I + A / 4)));
+}
+
 void ForwardEuler::init(const MpMat& mpm_M, const MpMat& mpm_L, double x_0, double x_n, double boundary) {
 
     // get t
@@ -61,15 +68,12 @@ void ForwardEuler::init(const MpMat& mpm_M, const MpMat& mpm_L, double x_0, doub
 
     // calc NUM_STEPS_
     eigen_mat M = mpm_M.to_matrix();
-    eigen_mat tM = M * t;
-    //eigen_mat e_tM = tM.exp();
-    eigen_mat e_tM = I + tM * (I + tM * 3 / 8 * (I + tM / 6 * (I + tM / 4)));
-    eigen_mat M_ = M.inverse();
-    eigen_mat tmp = (e_tM - I) * M_;
+    eigen_mat e_tM = mat_exp(M * t);
+    eigen_mat tmp = (e_tM - I) * M.inverse();
     eigen_vec ns = tmp * (t / boundary) * mpm_L.to_matrix();
     NUM_STEPS_ = (int)ns.maxCoeff() + 1;
     printf("Total step numbers: %d\n", NUM_STEPS_);
-    printf("Step size: %f\n", (double)(t / NUM_STEPS_));
+    printf("Step size: %.16f\n", (double)(t / NUM_STEPS_));
 
     // calc precision
     eigen_vec ones = eigen_vec::Ones();
