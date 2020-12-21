@@ -6,6 +6,7 @@
 */
 
 #include <Eigen/Core>
+#include <Eigen/Dense>
 #include "euler.h"
 #include "mpmat_utils.h"
 
@@ -15,11 +16,11 @@ MpMat EulerMethod::run(const MpMat& mpm_Y_0) {
 
     int num = NUM_STEPS_;
     MpMat mpm_Y_n = mpm_Y_0.copy();
-    //uint32_t Y_size = mpm_Y_0.row_num();
-    //Eigen::MatrixXd res(Y_size, num);
     for (int i = 0; i < num; i++) {
         mpm_Y_n = step(mpm_Y_n);
-        //res.block(0, i, Y_size, 1) = Y_n.to_matrix();
+        if (i % 10000 == 0) {
+            printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\bStep: %8d", i);
+        }
     }
     return mpm_Y_n;
 }
@@ -33,50 +34,49 @@ EulerMethod::~EulerMethod() {
     mp_num_clear(mp_h_);
 }
 
-/*
-
-    // calculation parameters
-    mp_num_t x_0, x_n;
-    mp_num_init(x_0);
-    mp_num_init(x_n);
-    mp_num_set_d(x_n, 0);
-    mp_num_set_d(x_n, x_n);
-*/
-
-
 /********* Forward Euler method *********/
 
 ForwardEuler::ForwardEuler(
     std::function<MpMat(const MpMat&)> F,
     const MpMat& mpm_M, const MpMat& mpm_L,
-    double x_0, double x_n) :
+    double x_0, double x_n, double boundary) :
     EulerMethod(F)
 {
-    init(mpm_M, mpm_L, x_0, x_n);
+    init(mpm_M, mpm_L, x_0, x_n, boundary);
 }
 
 MpMat ForwardEuler::step(const MpMat& mpm_Y_n) {
     return mpm_Y_n + F_(mpm_Y_n) * mp_h_;
 }
 
-void ForwardEuler::init(const MpMat& mpm_M, const MpMat& mpm_L, double x_0, double x_n) {
+void ForwardEuler::init(const MpMat& mpm_M, const MpMat& mpm_L, double x_0, double x_n, double boundary) {
 
     // get t
     double t = x_n - x_0;
 
     // prepare
     uint32_t Y_size = mpm_M.row_num();
-    Eigen::MatrixXd I(Y_size, Y_size);
+    eigen_mat I;
     I.setIdentity(Y_size, Y_size);
-    Eigen::MatrixXd tmp(Y_size, Y_size);
 
-    // calc n
-    Eigen::MatrixXd M = mpm_M.to_matrix();
-    Eigen::MatrixXd tM = M * t;
-    Eigen::MatrixXd e_tM = tM.exp();
-    Eigen::MatrixXd M_ = M.inverse();
-    tmp = (e_tM - I) * M_;
+    // calc NUM_STEPS_
+    eigen_mat M = mpm_M.to_matrix();
+    eigen_mat tM = M * t;
+    //eigen_mat e_tM = tM.exp();
+    eigen_mat e_tM = I + tM * (I + tM * 3 / 8 * (I + tM / 6 * (I + tM / 4)));
+    eigen_mat M_ = M.inverse();
+    eigen_mat tmp = (e_tM - I) * M_;
+    eigen_vec ns = tmp * (t / boundary) * mpm_L.to_matrix();
+    NUM_STEPS_ = (int)ns.maxCoeff() + 1;
+    printf("Total step numbers: %d\n", NUM_STEPS_);
+    printf("Step size: %f\n", (double)(t / NUM_STEPS_));
 
+    // calc precision
+    eigen_vec ones = eigen_vec::Ones();
+    eigen_vec tmp_2 = tmp * ones;
+    eigen_vec tmp_3 = tmp_2 * NUM_STEPS_ / (double)t / (double)boundary;
+    FLOAT_BITS_ = (int)log2(tmp_2.maxCoeff());
+    printf("Least bits of float: %d\n", FLOAT_BITS_);
 
     // calc h
     double h = t / NUM_STEPS_;
@@ -85,7 +85,6 @@ void ForwardEuler::init(const MpMat& mpm_M, const MpMat& mpm_L, double x_0, doub
     // set precision
     mpf_set_default_prec(FLOAT_BITS_);
     printf("Using float number of %d bits.\n", mpf_get_default_prec());
-
 }
 
 ForwardEuler::~ForwardEuler() {
@@ -96,13 +95,13 @@ ForwardEuler::~ForwardEuler() {
 TransformEuler::TransformEuler(
     std::function<MpMat(const MpMat&)> F,
     const MpMat& mpm_M, const MpMat& mpm_L,
-    double x_0, double x_n) :
+    double x_0, double x_n, double boundary) :
     EulerMethod(F)
 {
-    init(mpm_M, mpm_L, x_0, x_n);
+    init(mpm_M, mpm_L, x_0, x_n, boundary);
 }
 
-void TransformEuler::init(const MpMat& mpm_M, const MpMat& mpm_L, double x_0, double x_n) {
+void TransformEuler::init(const MpMat& mpm_M, const MpMat& mpm_L, double x_0, double x_n, double boundary) {
 
 }
 
@@ -112,6 +111,7 @@ MpMat TransformEuler::step(const MpMat& mpm_Y_n) {
     mp_num_div_ui(mp_half_h, mp_h_, 2);
 
     MpMat mpm_Y_n_bar = mpm_Y_n + F_(mpm_Y_n) * mp_half_h;
+    mp_num_clear(mp_half_h);
     return mpm_Y_n + F_(mpm_Y_n_bar) * mp_h_;
 }
 

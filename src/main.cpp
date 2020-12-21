@@ -28,39 +28,41 @@
 #include "mpmat_utils.h"
 #include "euler.h"
 
-char const* A[4][4] = {
+
+
+char const* A[EQ_NUM][EQ_NUM] = {
         "0", "0", "1", "0",
         "0", "0", "0", "0",
         "1", "0", "0", "0",
         "0", "0", "0", "0",
 };
-char const* B[4][1] = {
+char const* B[EQ_NUM][1] = {
     "-5e-7",
     "5e-7",
     "0",
     "0",
 };
-char const* C[4][4] = {
+char const* C[EQ_NUM][EQ_NUM] = {
     "0", "0", "0", "0",
     "0", "-0.4", "0", "0",
     "0", "0.4", "-0.5", "0",
     "0", "0", "0.5", "0",
 };
-char const* Y[4][1] = {
+char const* Y[EQ_NUM][1] = {
     "8000",
     "2000",
     "0",
     "0"
 };
 
-char const* M[4][4] = {
-    "5e-3", "0", "5e-3", "0",
+char const* M[EQ_NUM][EQ_NUM] = {
+    "5e-3", "0", "5e-3", "1e-9",
     "5e-3", "0.4", "5e-3", "0",
     "0", "0.4", "0.5", "0",
     "0", "0", "0.5", "0",
 };
 
-char const* L[4][1] = {
+char const* L[EQ_NUM][1] = {
     "4.1",
     "1690",
     "6120",
@@ -110,7 +112,9 @@ int main(int argc, char** argv) {
     get_args(argc, argv, boundary, x_n);
 
     // differencial equation
-    MpMat mpm_A(4, 4), mpm_B(4, 1), mpm_C(4, 4), mpm_Y(4, 1), mpm_M(4, 4), mpm_L(4, 1);
+    MpMat mpm_A(EQ_NUM, EQ_NUM), mpm_B(EQ_NUM, 1),
+        mpm_C(EQ_NUM, EQ_NUM), mpm_Y(EQ_NUM, 1),
+        mpm_M(EQ_NUM, EQ_NUM), mpm_L(4, 1);
     mpm_A.init((char const***)A);
     mpm_B.init((char const***)B);
     mpm_C.init((char const***)C);
@@ -121,18 +125,17 @@ int main(int argc, char** argv) {
 
     // run
     printf("Running forward Euler algorithm.\n");
-    ForwardEuler forward_euler(quardic, mpm_M, mpm_L, x_0, x_n);
+    ForwardEuler forward_euler(quardic, mpm_M, mpm_L, x_0, x_n, boundary);
     MpMat res = forward_euler.run(mpm_Y);
     printf("Result:\n");
     MpMat::print(res);
 
     printf("Running transform Euler algorithm.\n");
-    TransformEuler transform_euler(quardic, mpm_M, mpm_L, x_0, x_n);
+    TransformEuler transform_euler(quardic, mpm_M, mpm_L, x_0, x_n, boundary);
     res = transform_euler.run(mpm_Y);
     printf("Result:\n");
     MpMat::print(res);
 
     printf("Done.\n");
-
     return 0;
 }
