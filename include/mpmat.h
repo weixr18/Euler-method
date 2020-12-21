@@ -15,11 +15,11 @@
 
 //#define mp_num mpf_
 
-#define FLOAT_BITS 256
+static int INIT_FLOAT_BITS = 256;
 #define N_DIGITS 30
 
 #define mp_num_t mpf_t
-#define mp_num_init(x) mpf_init2(x, FLOAT_BITS)
+#define mp_num_init(x) mpf_init(x)
 #define mp_num_inits mpf_inits
 #define mp_num_set mpf_set
 #define mp_num_set_d mpf_set_d

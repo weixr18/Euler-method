@@ -16,26 +16,41 @@ public:
     EulerMethod(std::function<MpMat(const MpMat&)> F);
     virtual ~EulerMethod();
 public:
+    MpMat run(const MpMat& mpm_Y_0);
+    virtual void init(const MpMat& mpm_M, const MpMat& L, double x_0, double x_n) = 0;
+    virtual MpMat step(const MpMat& mpm_Y_n) = 0;
+protected:
     std::function<MpMat(const MpMat&)> F_;
-    MpMat run(const MpMat& Y_0, const mp_num_t& t0, const mp_num_t& t, const mp_num_t& n);
-    virtual MpMat step(const MpMat& Y_n, const mp_num_t& h) = 0;
+    int FLOAT_BITS_;
+    int NUM_STEPS_;
+    mp_num_t mp_h_;
 };
 
 
 class ForwardEuler : public EulerMethod
 {
 public:
-    using EulerMethod::EulerMethod;
+    ForwardEuler(
+        std::function<MpMat(const MpMat&)> F,
+        const MpMat& mpm_M, const MpMat& L,
+        double x_0, double x_n
+    );
     ~ForwardEuler();
-    MpMat step(const MpMat& Y_n, const mp_num_t& h);
+    void init(const MpMat& mpm_M, const MpMat& L, double x_0, double x_n);
+    MpMat step(const MpMat& mpm_Y_n);
 };
 
 class TransformEuler : public EulerMethod
 {
 public:
-    using EulerMethod::EulerMethod;
+    TransformEuler(
+        std::function<MpMat(const MpMat&)> F,
+        const MpMat& mpm_M, const MpMat& L,
+        double x_0, double x_n
+    );
     ~TransformEuler();
-    MpMat step(const MpMat& Y_n, const mp_num_t& h);
+    void init(const MpMat& mpm_M, const MpMat& L, double x_0, double x_n);
+    MpMat step(const MpMat& mpm_Y_n);
 };
 
 

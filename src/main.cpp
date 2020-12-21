@@ -24,95 +24,115 @@
 #include <iostream>
 #include <string.h>
 
-
 #include "mpmat.h"
 #include "mpmat_utils.h"
 #include "euler.h"
 
-
-int main(int argc, char** argv) {
-
-    // get args
-    bool args_format_right = false;
-    int i_x_n;
-    int i_steps;
-    args_format_right = (argc == 5)
-        && (strncmp(argv[1], "-s", 10) == 0)
-        && (strncmp(argv[3], "-x", 10) == 0)
-        && ((i_steps = atoi(argv[2])) > 0)
-        && ((i_x_n = atoi(argv[4])) > 0);
-
-    if (!args_format_right) {
-        printf("Arguments:\n");
-        printf("\t -s <step> Integer. Number of steps per unit of time.\n");
-        printf("\t -x <value> Integer. Terminal value of independant variable x.\n");
-        return 0;
-    }
-    int total_steps = i_steps * i_x_n;
-
-    // set precision
-    mpf_set_default_prec(FLOAT_BITS);
-    printf("Using float number of %d bits.\n", mpf_get_default_prec());
-
-    // differencial equation
-    char const* A[4][4] = {
+char const* A[4][4] = {
         "0", "0", "1", "0",
         "0", "0", "0", "0",
         "1", "0", "0", "0",
         "0", "0", "0", "0",
-    };
-    char const* B[4][1] = {
-        "-5e-7",
-        "5e-7",
-        "0",
-        "0",
-    };
-    char const* C[4][4] = {
-        "0", "0", "0", "0",
-        "0", "-0.4", "0", "0",
-        "0", "0.4", "-0.5", "0",
-        "0", "0", "0.5", "0",
-    };
-    char const* Y[4][1] = {
-        "8000",
-        "2000",
-        "0",
-        "0"
-    };
+};
+char const* B[4][1] = {
+    "-5e-7",
+    "5e-7",
+    "0",
+    "0",
+};
+char const* C[4][4] = {
+    "0", "0", "0", "0",
+    "0", "-0.4", "0", "0",
+    "0", "0.4", "-0.5", "0",
+    "0", "0", "0.5", "0",
+};
+char const* Y[4][1] = {
+    "8000",
+    "2000",
+    "0",
+    "0"
+};
 
-    MpMat mA(4, 4), mB(4, 1), mC(4, 4), mY(4, 1);
-    mA.init((char const***)A);
-    mB.init((char const***)B);
-    mC.init((char const***)C);
-    mY.init((char const***)Y);
+char const* M[4][4] = {
+    "5e-3", "0", "5e-3", "0",
+    "5e-3", "0.4", "5e-3", "0",
+    "0", "0.4", "0.5", "0",
+    "0", "0", "0.5", "0",
+};
 
-    auto quardic = [&](const MpMat& Y) {return mB * Y.T() * mA * Y + mC * Y;};
+char const* L[4][1] = {
+    "4.1",
+    "1690",
+    "6120",
+    "2000",
+};
 
-    // calculation parameters
-    mp_num_t x_0, x_n, step_num;
-    mp_num_init(x_0);
-    mp_num_init(x_n);
-    mp_num_init(step_num);
-    mp_num_set_d(x_n, i_x_n);
-    mp_num_set_d(step_num, total_steps);
+void get_args(int argc, char** argv, int& boundary, int& x_n) {
+
+    bool args_format_right = true;
+    boundary = -1;
+    x_n = -1;
+    for (int i = 1; i + 1 < argc; i += 2) {
+        if (strncmp(argv[i], "-b", 10) == 0) {
+            boundary = atoi(argv[i + 1]);
+        }
+        else if (strncmp(argv[i], "-x", 10) == 0) {
+            x_n = atoi(argv[i + 1]);
+        }
+        else {
+            args_format_right = false;
+        }
+    }
+
+    if (boundary <= 0 || x_n < 0 || !args_format_right) {
+        printf("Usage:\n");
+        printf("\t (1) ./main -b <boundary> -x <value>\n");
+        printf("Arguments:\n");
+        printf("\t -b <boundary> Integer. Error boundary.\n");
+        printf("\t -x <value> Integer. Terminal value of independant variable x.\n");
+        exit(0);
+    }
+}
+
+/*
+    Input:  x_0=0, x_n, b
+    Set:    F(·), Y_0, M, L
+    Calc:   h, NUM_STEPS, FLOAT_BITS
+    Output: Y(x_n)
+*/
+
+int main(int argc, char** argv) {
+
+    // get args 
+    int x_0 = 0,    // x_0
+        x_n,        // target x
+        boundary;   // boudary
+    get_args(argc, argv, boundary, x_n);
+
+    // differencial equation
+    MpMat mpm_A(4, 4), mpm_B(4, 1), mpm_C(4, 4), mpm_Y(4, 1), mpm_M(4, 4), mpm_L(4, 1);
+    mpm_A.init((char const***)A);
+    mpm_B.init((char const***)B);
+    mpm_C.init((char const***)C);
+    mpm_Y.init((char const***)Y);
+    mpm_M.init((char const***)M);
+    mpm_L.init((char const***)L);
+    auto quardic = [&](const MpMat& mpm_Y) {return mpm_B * mpm_Y.T() * mpm_A * mpm_Y + mpm_C * mpm_Y;};
 
     // run
     printf("Running forward Euler algorithm.\n");
-    ForwardEuler forward_euler(quardic);
-    MpMat res = forward_euler.run(mY, x_0, x_n, step_num);
+    ForwardEuler forward_euler(quardic, mpm_M, mpm_L, x_0, x_n);
+    MpMat res = forward_euler.run(mpm_Y);
     printf("Result:\n");
     MpMat::print(res);
 
     printf("Running transform Euler algorithm.\n");
-    TransformEuler transform_euler(quardic);
-    res = transform_euler.run(mY, x_0, x_n, step_num);
+    TransformEuler transform_euler(quardic, mpm_M, mpm_L, x_0, x_n);
+    res = transform_euler.run(mpm_Y);
     printf("Result:\n");
     MpMat::print(res);
 
     printf("Done.\n");
-    mp_num_clear(x_0);
-    mp_num_clear(x_n);
-    mp_num_clear(step_num);
 
     return 0;
 }
